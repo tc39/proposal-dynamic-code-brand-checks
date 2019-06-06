@@ -5,7 +5,7 @@
 Champion(s): mikesamuel <br>
 Author(s): mikesamuel <br>
 Stage: [1](https://tc39.github.io/process-document/) <br>
-Spec: [ecmarkup output][], [source][]
+Spec: [ecmarkup output][draft spec], [source][]
 
 ## Historical Note
 
