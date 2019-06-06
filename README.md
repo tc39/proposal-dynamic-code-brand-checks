@@ -1,5 +1,22 @@
 # TC39 Proposal: Dynamic Code Brand Checks
 
+## Table of Contents
+* [Status](#status)
+* [Historical Note](#historical-note)
+* [Motivation](#motivation)
+* [Problem: %eval% does not accept objects in lieu of strings for code](#problem-eval-does-not-accept-objects-in-lieu-of-strings-for-code)
+  + [Backwards compatibility constraints](#backwards-compatibility-constraints)
+  + [Solution](#solution)
+    - [Internal slot](#internal-slot)
+      * [Pros](#pros)
+    - [Well-known Symbol](#well-known-symbol)
+      * [Pros](#pros-1)
+* [Problem: Host callout does not receive type information](#problem-host-callout-does-not-receive-type-information)
+  + [Solution](#solution-1)
+* [Problem: host callout cannot adjust values](#problem-host-callout-cannot-adjust-values)
+  + [Solution](#solution-2)
+* [Tests](#tests)
+
 ## Status
 
 Champion(s): mikesamuel <br>
@@ -119,7 +136,7 @@ All the approaches below do the following
 
 From [ecma262 issue #938](https://github.com/tc39/ecma262/issues/938#issuecomment-457352474):
 
-> # Include the string to be compiled in the call to
+> Include the string to be compiled in the call to
 > `HostEnsureCanCompileStrings` Perhaps we could tweak the `eval` algo
 > so that if the input is a string or has a particular symbol property
 > then it is stringified to avoid breaking code that depends on the
