@@ -1,0 +1,14 @@
+{
+  "https://tc39.github.io/ecma262/": [
+    {
+      "type": "op",
+      "aoid": "CreateDynamicFunction"
+    }
+  ]
+  "https://wicg.github.io/trusted-types/dist/spec/": [
+    {
+      "type": "typedef",
+      "aoid": "TrustedScript"
+    }
+  ]
+}
