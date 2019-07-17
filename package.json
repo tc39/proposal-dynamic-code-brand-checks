@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mikesamuel/dynamic-code-branch-checks.git"
+    "url": "git+https://github.com/tc39/dynamic-code-branch-checks.git"
   },
   "author": "Mike Samuel",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mikesamuel/dynamic-code-branch-checks/issues"
+    "url": "https://github.com/tc39/dynamic-code-branch-checks/issues"
   },
-  "homepage": "https://github.com/mikesamuel/dynamic-code-branch-checks#readme",
+  "homepage": "https://github.com/tc39/dynamic-code-branch-checks#readme",
   "devDependencies": {
     "chai": "^4.2.0",
     "ecmarkup": "^3.16.0",

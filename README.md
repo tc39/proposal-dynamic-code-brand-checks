@@ -168,8 +168,8 @@ a string is a pair of realms.
 > functions which allow developers to compile strings into ECMAScript
 > code.
 
-There is a web reality issue here.  [CSP3's issue 8](https://www.w3.org/TR/CSP3/#issues-index)
-notes:
+There is a web reality issue here.
+[CSP3's issue 8](https://www.w3.org/TR/CSP3/#issues-index) notes:
 
 > <code>HostEnsureCanCompileStrings()</code> does not include the
 > string which is going to be compiled as a parameter. We’ll also need
@@ -221,9 +221,7 @@ be specified as [web-platform-tests](https://github.com/web-platform-tests/wpt).
 
 [core-js-example]: https://github.com/zloirock/core-js/blob/2a005abe68520248d4431cab70d86e40b55d6e98/packages/core-js/internals/global.js#L5
 [TT]: https://wicg.github.io/trusted-types/dist/spec/
-[Trusted Types]: https://wicg.github.io/trusted-types
-[TrustedScript]: https://wicg.github.io/trusted-types/dist/spec/#typedef-trustedscript
-[source]: https://github.com/mikesamuel/proposal-hostensurecancompilestrings-passthru/blob/master/spec.emu
+[source]: https://github.com/tc39/proposal-dynamic-code-brand-checks/blob/master/spec.emu
 [default policy]: https://wicg.github.io/trusted-types/dist/spec/#default-policy-hdr
 [createScript callback]: https://wicg.github.io/trusted-types/dist/spec/#callbackdef-createscriptcallback
-[draft spec]: https://mikesamuel.github.io/dynamic-code-brand-checks/
+[draft spec]: https://tc39.github.io/dynamic-code-brand-checks/

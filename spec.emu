@@ -10,7 +10,7 @@ contributors: Mike Samuel
 </pre>
 
 See also the
-<a href="https://github.com/mikesamuel/dynamic-code-brand-checks">explainer</a>.
+<a href="https://github.com/tc39/dynamic-code-brand-checks">explainer</a>.
 
 <h2>Background</h2>
 
@@ -30,8 +30,8 @@ that arguments to <code>eval(x)</code> and <code>new Function(x)</code> are
 After feedback from TC39, this proposal was merged from two stage-0 proposals:
 
 <ul>
-  <li><a href="https://github.com/mikesamuel/evalable">Relax the requirement that the argument to eval be a string in a non-breaking way</a></li>
-  <li><a href="https://github.com/mikesamuel/proposal-hostensurecancompilestrings-passthru">
+  <li><a href="https://github.com/tc39/evalable">Relax the requirement that the argument to eval be a string in a non-breaking way</a></li>
+  <li><a href="https://github.com/tc39/proposal-hostensurecancompilestrings-passthru">
       TC39 Proposal to allow HostEnsureCanCompileStrings to pass enough information to/from the host to implement expected changes to CSP & TT
     </a></li>
 </ul>
