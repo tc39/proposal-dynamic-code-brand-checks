@@ -145,7 +145,7 @@ From [ecma262 issue #938](https://github.com/tc39/ecma262/issues/938#issuecommen
 *  Define a well-known symbol, *\@\@evalable*.
 *  IsCodeLike(*x*) additionally returns true when *x* is an object and
    `x[Symbol.evalable]` is truthy.
-   Note: using a new symbol makes IsCodeLike backwards comparible for programs
+   Note: using a new symbol makes IsCodeLike backwards compatible for programs
    that do not use `Symbol.evalable`.
 
 ##### Pros
