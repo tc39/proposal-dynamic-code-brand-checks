@@ -224,4 +224,4 @@ be specified as [web-platform-tests](https://github.com/web-platform-tests/wpt).
 [source]: https://github.com/tc39/proposal-dynamic-code-brand-checks/blob/master/spec.emu
 [default policy]: https://wicg.github.io/trusted-types/dist/spec/#default-policy-hdr
 [createScript callback]: https://wicg.github.io/trusted-types/dist/spec/#callbackdef-createscriptcallback
-[draft spec]: https://tc39.github.io/dynamic-code-brand-checks/
+[draft spec]: https://tc39.es/proposal-dynamic-code-brand-checks/
