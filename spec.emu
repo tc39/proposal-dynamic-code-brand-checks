@@ -227,7 +227,7 @@ PerformEval now:
   <p>The abstract operation PerformEval with arguments _x_, _callerRealm_, _strictCaller_, and _direct_ performs the following steps:</p>
   <emu-alg>
     1. Assert: If _direct_ is *false*, then _strictCaller_ is also *false*.
-    1. If <del>Type(_x_) is not String</del> <ins>IsCodeLike(_x_)</ins>, return _x_.
+    1. If <del>Type(_x_) is not String</del> <ins>IsCodeLike(_x_) is *false*</ins>, return _x_.
     1. Let _evalRealm_ be the current Realm Record.
     1. <ins>Let _args_ be a list containing only _x_.</ins>
     1. <del>Perform ? HostEnsureCanCompileStrings(_callerRealm_, _calleeRealm_).</del><br>
