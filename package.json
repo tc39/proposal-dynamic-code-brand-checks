@@ -19,7 +19,7 @@
   "homepage": "https://github.com/tc39/dynamic-code-branch-checks#readme",
   "devDependencies": {
     "chai": "^4.2.0",
-    "ecmarkup": "^3.16.0",
+    "ecmarkup": "^4.2.1",
     "mocha": "^6.0.2",
     "pre-commit": "^1.2.2"
   },
