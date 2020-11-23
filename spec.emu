@@ -6,7 +6,7 @@
 <pre class="metadata">
 title: Dynamic Code Brand Checks
 stage: 1
-contributors: Mike Samuel
+contributors: Krzysztof Kotowicz, Mike Samuel
 </pre>
 
 <p>
@@ -15,31 +15,21 @@ See also the
 
 <h2>Background</h2>
 
-<p>The <a href="https://wicg.github.com/trusted-types/">Trusted Types proposal</a>
+<p>The <a href="https://w3c.github.com/webappsec-trusted-types/">Trusted Types proposal</a>
 (<a href="https://docs.google.com/presentation/d/e/2PACX-1vQCbxmHKjPWUq7MC91x6tJKanFYU2i9Z13wwfkngcseHt96EfU_xyA0awkxb4SoNW3hQ3S2z-ByX0T9/pub?start=false&loop=false&delayms=60000">explainer for TC39</a>)
-seeks to double-check risky operations like code loading by requiring
+seeks to guard risky operations like dynamic code evaluation by requiring
 that code portions have a runtime type that indicates that they have
 been explicitly trusted.</p>
 
-<p>Specifically, when Trusted Types is turned on, it would like to ensure
+<p>Specifically, when Trusted Types enforcement is turned on, it would like to ensure
 that arguments to <code>eval(x)</code> and <code>new Function(x)</code> are
 (or are convertible to)
-<a href="https://wicg.github.io/trusted-types/dist/spec/#typedef-trustedscript">TrustedScript</a>.</p>
-
-<h3>Historical Note</h3>
-
-<p>After feedback from TC39, this proposal was merged from two stage-0 proposals:</p>
-
-<ul>
-  <li><a href="https://github.com/tc39/evalable">Relax the requirement that the argument to eval be a string in a non-breaking way</a></li>
-  <li><a href="https://github.com/tc39/proposal-hostensurecancompilestrings-passthru">
-      TC39 Proposal to allow HostEnsureCanCompileStrings to pass enough information to/from the host to implement expected changes to CSP & TT
-    </a></li>
-</ul>
+<a href="https://w3c.github.io/webappsec-trusted-types/dist/spec/#typedef-trustedscript">TrustedScript</a>.
+This enhances the existing dynamic code evaluation guards that the web platform already controls with <a href="https://w3c.github.io/webappsec-csp/">Content Security Policy</a>.</p>
 
 <h3>Problem 1: %eval% does not accept objects in lieu of strings for code</h3>
 
-<p>PerformEval early outs when its argument is not a string.</p>
+<p>PerformEval exits early when its argument is not a string.</p>
 
 <emu-alg>
   2. If Type(_x_) is not String, return _x_.
@@ -110,6 +100,21 @@ eval('input') === globalThis.output;  // true
 
 <p>This proposal adjusts callers of the callback to expect a result and to use it in place
 of the inputs.</p>
+
+<h3>Problem 4: host callout doesn't pass the code to check</h3>
+
+<p><a href="https://tc39.es/ecma262/#sec-hostensurecancompilestrings">HostEnsureCanCompileStrings</a>
+callout only passes the realms to the host environment. In the web platform,
+that callout is hooked to the <a href="https://w3c.github.io/webappsec-csp/#should-block-inline">Content Security Policy algorithms</a>,
+which operate on <em>code</em> that is to be executed - e.g. a script body, or
+a function body, both to determine if the specific string is allowed to be executed
+(e.g. <a href="https://w3c.github.io/webappsec-csp/#match-element-to-source-list">based on its hash</a>), and to <a href="https://w3c.github.io/webappsec-csp/#security-violation-reports">report violations</a>.
+As such, some implementations (v8 and SpiderMonkey) actually also pass the code string
+to the host, and in the case of <code>new Function()</code> perform the callout
+later in <a href="https://tc39.es/ecma262/#sec-createdynamicfunction">CreateDynamicFunction</a>,
+after the function body is assembled.
+</p>
+<p>This proposal updates the host callout to contain the script to be executed, and move the callout in CreateDynamicFunction after the function body is assembled.</p>
 
 <h2>Changes to HostEnsureCanCompileStrings</h2>
 
@@ -277,7 +282,6 @@ Proxies over code-like values are not themselves code-like.
     1. <ins>Return *false*.</ins>
   </emu-alg>
 </emu-clause>
-
 
 <h2>Option 2 - Well known symbol</h2>
 
