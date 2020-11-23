@@ -41,8 +41,7 @@ attested to previously.</p>
 
 <ul>
  <li>Adds an algorithm, <emu-xref aoid="IsCodeLike">IsCodeLike</emu-xref>
-   that treats strings for backwards compatibility but also returns *true* for
-   some objects.
+   that returns *true* for some objects ordained by the hosts to be code-like.
    See the options below for details of which objects are code-like.</li>
  <li>Tweaks <a href="https://tc39.github.io/ecma262#sec-performeval">PerformEval</a>
    to use IsCodeLike and to coerce the code to a string.</li>
@@ -59,13 +58,7 @@ attested to previously.</p>
 
 <p>This proposal aims to provide additional context to HostEnsureCanCompileStrings,
 and reorder the steps in CreateDynamicFunction so that HostEnsureCanCompileStrings
-receives runtime type information.</p>
-
-<ol>
-<li>The production to use to parse the source text.
-<li>The value of any parameters and source text before coercion to strings.
-<li>A bit to distinguish between indirect and direct <code>eval</code>.
-</ol>
+knows if all the input arguments were code-like.</p>
 
 <h3>Problem 3: host callout cannot adjust values</h3>
 
@@ -79,10 +72,10 @@ For example, if the default policy's `createScript` callback returns `"output"` 
 </p>
 
 <pre><code class="html">
-&lt;meta http-equiv="Content-Security-Policy" content="trusted-types default" /&gt;
+&lt;meta http-equiv="Content-Security-Policy" content="require-trusted-types-for 'script'" /&gt;
 &lt;script&gt;
 // Define a default policy that maps the source text `input` to `output`.
-TrustedTypes.createPolicy(
+window.trustedTypes.createPolicy(
   'default',
   {
     createScript(code) {
@@ -106,15 +99,15 @@ of the inputs.</p>
 <p><a href="https://tc39.es/ecma262/#sec-hostensurecancompilestrings">HostEnsureCanCompileStrings</a>
 callout only passes the realms to the host environment. In the web platform,
 that callout is hooked to the <a href="https://w3c.github.io/webappsec-csp/#should-block-inline">Content Security Policy algorithms</a>,
-which operate on <em>code</em> that is to be executed - e.g. a script body, or
-a function body, both to determine if the specific string is allowed to be executed
-(e.g. <a href="https://w3c.github.io/webappsec-csp/#match-element-to-source-list">based on its hash</a>), and to <a href="https://w3c.github.io/webappsec-csp/#security-violation-reports">report violations</a>.
+which take action based on <em>code</em> that is to be executed - e.g. an eval() argument, or
+a dynamically-created function body, at least to be able to include that code in <a href="https://w3c.github.io/webappsec-csp/#security-violation-reports">violation reports</a>.
 As such, some implementations (v8 and SpiderMonkey) actually also pass the code string
 to the host, and in the case of <code>new Function()</code> perform the callout
 later in <a href="https://tc39.es/ecma262/#sec-createdynamicfunction">CreateDynamicFunction</a>,
 after the function body is assembled.
 </p>
-<p>This proposal updates the host callout to contain the script to be executed, and move the callout in CreateDynamicFunction after the function body is assembled.</p>
+<p>This proposal updates the host callout to contain the script to be executed,
+and moves the callout in CreateDynamicFunction after the function body is assembled.</p>
 
 
 <emu-clause id="sec-iscodelike" aoid="IsCodeLike">

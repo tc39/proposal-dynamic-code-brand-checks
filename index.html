@@ -1877,8 +1877,7 @@ attested to previously.</p>
 
 <ul>
  <li>Adds an algorithm, <emu-xref aoid="IsCodeLike" id="_ref_0"><a href="#sec-iscodelike">IsCodeLike</a></emu-xref>
-   that treats strings for backwards compatibility but also returns <emu-val>true</emu-val> for
-   some objects.
+   that returns <emu-val>true</emu-val> for some objects ordained by the hosts to be code-like.
    See the options below for details of which objects are code-like.</li>
  <li>Tweaks <a href="https://tc39.github.io/ecma262#sec-performeval">PerformEval</a>
    to use <emu-xref aoid="IsCodeLike" id="_ref_4"><a href="#sec-iscodelike">IsCodeLike</a></emu-xref> and to coerce the code to a string.</li>
@@ -1893,13 +1892,7 @@ attested to previously.</p>
 
 <p>This proposal aims to provide additional context to <emu-xref aoid="HostEnsureCanCompileStrings" id="_ref_6"><a href="https://tc39.es/ecma262/#sec-hostensurecancompilestrings">HostEnsureCanCompileStrings</a></emu-xref>,
 and reorder the steps in <emu-xref aoid="CreateDynamicFunction" id="_ref_7"><a href="#sec-createdynamicfunction">CreateDynamicFunction</a></emu-xref> so that <emu-xref aoid="HostEnsureCanCompileStrings" id="_ref_8"><a href="https://tc39.es/ecma262/#sec-hostensurecancompilestrings">HostEnsureCanCompileStrings</a></emu-xref>
-receives runtime type information.</p>
-
-<ol>
-<li>The production to use to parse the source text.
-</li><li>The value of any parameters and source text before coercion to strings.
-</li><li>A bit to distinguish between indirect and direct <code>eval</code>.
-</li></ol>
+knows if all the input arguments were code-like.</p>
 
 <h3>Problem 3: host callout cannot adjust values</h3>
 
@@ -1911,10 +1904,10 @@ For example, if the default policy's <code>createScript</code> callback returns 
 <code>output</code>.
 </p>
 
-<pre><code class="html hljs"><span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">http-equiv</span>=<span class="hljs-string">"Content-Security-Policy"</span> <span class="hljs-attr">content</span>=<span class="hljs-string">"trusted-types default"</span> /&gt;</span>
+<pre><code class="html hljs"><span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">http-equiv</span>=<span class="hljs-string">"Content-Security-Policy"</span> <span class="hljs-attr">content</span>=<span class="hljs-string">"require-trusted-types-for 'script'"</span> /&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">
 <span class="hljs-comment">// Define a default policy that maps the source text `input` to `output`.</span>
-TrustedTypes.createPolicy(
+<span class="hljs-built_in">window</span>.trustedTypes.createPolicy(
   <span class="hljs-string">'default'</span>,
   {
     createScript(code) {
@@ -1937,15 +1930,15 @@ of the inputs.</p>
 <p><a href="https://tc39.es/ecma262/#sec-hostensurecancompilestrings">HostEnsureCanCompileStrings</a>
 callout only passes the realms to the host environment. In the web platform,
 that callout is hooked to the <a href="https://w3c.github.io/webappsec-csp/#should-block-inline">Content Security Policy algorithms</a>,
-which operate on <em>code</em> that is to be executed - e.g. a script body, or
-a function body, both to determine if the specific string is allowed to be executed
-(e.g. <a href="https://w3c.github.io/webappsec-csp/#match-element-to-source-list">based on its hash</a>), and to <a href="https://w3c.github.io/webappsec-csp/#security-violation-reports">report violations</a>.
+which take action based on <em>code</em> that is to be executed - e.g. an eval() argument, or
+a dynamically-created function body, at least to be able to include that code in <a href="https://w3c.github.io/webappsec-csp/#security-violation-reports">violation reports</a>.
 As such, some implementations (v8 and SpiderMonkey) actually also pass the code string
 to the host, and in the case of <code>new Function()</code> perform the callout
 later in <a href="https://tc39.es/ecma262/#sec-createdynamicfunction">CreateDynamicFunction</a>,
 after the function body is assembled.
 </p>
-<p>This proposal updates the host callout to contain the script to be executed, and move the callout in <emu-xref aoid="CreateDynamicFunction" id="_ref_9"><a href="#sec-createdynamicfunction">CreateDynamicFunction</a></emu-xref> after the function body is assembled.</p>
+<p>This proposal updates the host callout to contain the script to be executed,
+and moves the callout in <emu-xref aoid="CreateDynamicFunction" id="_ref_9"><a href="#sec-createdynamicfunction">CreateDynamicFunction</a></emu-xref> after the function body is assembled.</p>
 
 
 <emu-clause id="sec-iscodelike" aoid="IsCodeLike">
