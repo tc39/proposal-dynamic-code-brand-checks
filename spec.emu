@@ -58,7 +58,7 @@ attested to previously.</p>
 </emu-alg>
 
 <p>This proposal aims to provide additional context to HostEnsureCanCompileStrings,
-and reorder the steps in CreateDynamicFunction so that HostEnsureCanCompilerStrings
+and reorder the steps in CreateDynamicFunction so that HostEnsureCanCompileStrings
 receives runtime type information.</p>
 
 <ol>
@@ -116,81 +116,41 @@ after the function body is assembled.
 </p>
 <p>This proposal updates the host callout to contain the script to be executed, and move the callout in CreateDynamicFunction after the function body is assembled.</p>
 
-<h2>Changes to HostEnsureCanCompileStrings</h2>
 
-<emu-clause id="sec-hostbeforecompilevalue">
-  <h1><del>HostEnsureCanCompileStrings</del> <ins>HostBeforeCompileValue</ins> ( _callerRealm_, _calleeRealm_<ins>, _goal_, _args_</ins>)</h1>
-
-  <p><del>HostEnsureCanCompileStrings</del> <ins>HostBeforeCompileValue</ins> is an implementation-defined abstract operation that allows host environments to block certain ECMAScript functions which allow developers to compile strings into ECMAScript code.</p>
-
-  <p>An implementation
-  of <del>HostEnsureCanCompileStrings</del> <ins>HostBeforeCompileValue</ins>
-  may complete normally or abruptly. Any abrupt completions will be
-  propagated to its callers. The default implementation
-  of <del>HostEnsureCanCompileStrings</del> <ins>HostBeforeCompileValue</ins>
-  is to unconditionally return <del>an empty</del> <ins>a</ins> normal
-  completion <ins>with a value of _args_</ins>.</p>
-
-  <p><ins>_args_ must be a list of values.</ins></p>
-
-  <p><ins>Any normal completion value from HostBeforeCompileValue must
-  be a list of values.</ins></p>
-
-  <p><ins>Any normal completion value from HostBeforeCompileValue
-  should be used by callers in place of the input _args_.</ins></p>
-
-  <emu-note><ins>For `eval` _args_ will have a single element, the
-  source to evaluate.  For MakeDynamicFunction it may have any number
-  of elements that are joined on comma to form source text for
-  |FormalParameters| followed by a body.</ins></emu-note>
-
-  <emu-note><ins>_goal_ is the production which will be used to parse
-  the last element of _args_.  For example, if called via %Function%
-  it might be the grammar symbol |FunctionBody[~Yield, ~Await]| and
-  from %eval% it might be the grammar symbol
-  |Script|.</ins></emu-note>
-
-  <p><ins>Implementations that stringify any element _i_ of _args_ where
-  _i_ &ne; 0 must stringify _args_[_i_-1] before stringifying _args_[_i_].</ins></p>
-
-  <p><ins>Implementations that stringify any element of _args_ should return
-  the stringified result in place of that element where that element informs
-  part of the output.</ins></p>
-
-  <emu-note><ins><p>This avoids visible side-effects due to multiple
-  stringification of user-defined objects as in:</p>
-
-  <pre><code class="javascript">
-  new Function(
-    {
-      toString() {
-        console.log('parameter stringified');
-        return 'x, y';
-      }
-    },
-    {
-      toString() {
-        console.log('body stringified');
-        return 'x + y';
-      }
-    });
-  </code></pre></ins></emu-note>
-
-  <p><ins>Implementations must return a single element list when _args_ has
-  a single element and _goal_ is *ScriptBody*.</ins></p>
-
-  <emu-note><ins>This avoids complicating PerformEval.</ins></emu-note>
+<emu-clause id="sec-iscodelike" aoid="IsCodeLike">
+  <h1><ins>Runtime Semantics: IsCodeLike ( _x_ )</ins></h1>
+  <p><ins>The abstract operation IsCodeLike with arguments _x_ checks if _x_ contains the host-defined [[HostDefinedCodeLike]] internal slot. It performs the following steps:</ins></p>
+  <emu-alg>
+    1. <ins>If _x_ has a [[HostDefinedCodeLike]] internal slot, then return *true*.
+    1. <ins>Return *false*.</ins>
+  </emu-alg>
 </emu-clause>
 
-<h2>Changes to CreateDynamicFunction</h2>
+<emu-clause id="sec-hostvalidatedynamiccode" aoid="HostValidateDynamicCode">
+        <h1><del>HostEnsureCanCompileStrings</del> <ins>HostValidateDynamicCode</ins> ( _callerRealm_, _calleeRealm_<ins>, _codeString_, _wasCodeLike_</ins>)</h1>
+        <p><del>HostEnsureCanCompileStrings</del> <ins>HostValidateDynamicCode</ins> is a host-defined abstract operation that allows host environments to <del>block</del><ins>guard</ins> certain ECMAScript functions which allow developers to compile strings into ECMAScript code.</p>
+        <p>An implementation of <del>HostEnsureCanCompileStrings</del> <ins>HostValidateDynamicCode</ins> may complete normally or abruptly. Any abrupt completions will be propagated to its callers. The default implementation of <del>HostEnsureCanCompileStrings</del><ins>HostValidateDynamicCode</ins> is to unconditionally return a NormalCompletion(_codeString_).</p>
+</emu-clause>
 
-<p>CreateDynamicFunction now waits until after it figures out what _kind_
-of function it is creating and uses the result of the adjusted host
-callout.</p>
 
-<emu-clause id="sec-createdynamicfunction-new">
-  <h1>Runtime Semantics: CreateDynamicFunction ( _constructor_, _newTarget_, _kind_, _args_ )</h1>
-  <p>The abstract operation CreateDynamicFunction is called with arguments _constructor_, _newTarget_, _kind_, and _args_. _constructor_ is the constructor function that is performing this action, _newTarget_ is the constructor that `new` was initially applied to, _kind_ is either `"normal"`, `"generator"`, `"async"`, or `"async generator"`, and _args_ is a List containing the actual argument values that were passed to _constructor_. The following steps are taken:</p>
+<emu-clause id="sec-performeval" aoid="PerformEval">
+  <h1>Runtime Semantics: PerformEval ( _x_, _callerRealm_, _strictCaller_, _direct_ )</h1>
+  <p>The abstract operation PerformEval with arguments _x_, _callerRealm_, _strictCaller_, and _direct_ performs the following steps:</p>
+  <emu-alg>
+    1. Assert: If _direct_ is *false*, then _strictCaller_ is also *false*.
+    1. <ins>Let _isCodeLike_  be ! IsCodeLike(_x_).</ins>
+    1. If Type(_x_) is not String <ins>and _isCodeLike_ is *false*</ins>, return _x_.
+    1. Let _evalRealm_ be the current Realm Record.
+    1. <del>Perform ? HostEnsureCanCompileStrings(_callerRealm_, _calleeRealm_).</del><br>
+       <ins>Set _x_ to be ? ToString(HostValidateDynamicCode(_callerRealm_, _calleeRealm_, ToString(_x_), _isCodeLike_)).</ins>
+    1. ...
+  </emu-alg>
+</emu-clause>
+
+
+<emu-clause id="sec-createdynamicfunction" aoid="CreateDynamicFunction">
+  <h1>CreateDynamicFunction ( _constructor_, _newTarget_, _kind_, _args_ )</h1>
+  <p>The abstract operation CreateDynamicFunction takes arguments _constructor_ (a constructor), _newTarget_ (a constructor), _kind_ (either ~normal~, ~generator~, ~async~, or ~asyncGenerator~), and _args_ (a List of ECMAScript language values). _constructor_ is the constructor function that is performing this action. _newTarget_ is the constructor that `new` was initially applied to. _args_ is the argument values that were passed to _constructor_. It performs the following steps when called:</p>
   <emu-alg>
     1. Assert: The execution context stack has at least two elements.
     1. Let _callerContext_ be the second to top element of the execution context stack.
@@ -198,63 +158,58 @@ callout.</p>
     1. Let _calleeRealm_ be the current Realm Record.
     1. <del>Perform ? HostEnsureCanCompileStrings(_callerRealm_, _calleeRealm_).</del>
     1. If _newTarget_ is *undefined*, set _newTarget_ to _constructor_.
-    1. If _kind_ is `"normal"`, then
+    1. If _kind_ is ~normal~, then
       1. Let _goal_ be the grammar symbol |FunctionBody[~Yield, ~Await]|.
       1. Let _parameterGoal_ be the grammar symbol |FormalParameters[~Yield, ~Await]|.
-      1. Let _fallbackProto_ be `"%FunctionPrototype%"`.
-    1. Else if _kind_ is `"generator"`, then
+      1. Let _fallbackProto_ be *"%Function.prototype%"*.
+    1. Else if _kind_ is ~generator~, then
       1. Let _goal_ be the grammar symbol |GeneratorBody|.
       1. Let _parameterGoal_ be the grammar symbol |FormalParameters[+Yield, ~Await]|.
-      1. Let _fallbackProto_ be `"%Generator%"`.
-    1. Else if _kind_ is `"async"`, then
+      1. Let _fallbackProto_ be *"%GeneratorFunction.prototype%"*.
+    1. Else if _kind_ is ~async~, then
       1. Let _goal_ be the grammar symbol |AsyncFunctionBody|.
       1. Let _parameterGoal_ be the grammar symbol |FormalParameters[~Yield, +Await]|.
-      1. Let _fallbackProto_ be `"%AsyncFunctionPrototype%"`.
+      1. Let _fallbackProto_ be *"%AsyncFunction.prototype%"*.
     1. Else,
-      1. Assert: _kind_ is `"async generator"`.
+      1. Assert: _kind_ is ~asyncGenerator~.
       1. Let _goal_ be the grammar symbol |AsyncGeneratorBody|.
       1. Let _parameterGoal_ be the grammar symbol |FormalParameters[+Yield, +Await]|.
-      1. Let _fallbackProto_ be `"%AsyncGenerator%"`.
-    1. <ins>Set _args_ to ! <b>HostBeforeCompileValue</b>(_callerRealm_, _calleeRealm_, <b>_goal_, _args_</b>).</ins>
+      1. Let _fallbackProto_ be *"%AsyncGeneratorFunction.prototype%"*.
     1. Let _argCount_ be the number of elements in _args_.
+    1. Let _P_ be the empty String.
+    1. <ins>Let _assembledFromCodeLike_ be *true*.</ins>
+    1. If _argCount_ = 0, let _bodyArg_ be the empty String.
+    1. Else if _argCount_ = 1, <del>let _bodyArg_ be _args_[0]</del>.
+      1. <ins>Let _bodyArg_ be _args_[0].</ins>
+      1. <ins>If IsCodeLike(_bodyArg_) is *false*, set _assembledFromCodeLike_ to *false*.</ins>
+    1. Else,
+      1. Assert: _argCount_ &gt; 1.
+      1. Let _firstArg_ be _args_[0].
+      1. <ins>If IsCodeLike(_firstArg_) is *false*, set _assembledFromCodeLike_ to *false*.</ins>
+      1. Set _P_ to ? ToString(_firstArg_).
+      1. Let _k_ be 1.
+      1. Repeat, while _k_ &lt; _argCount_ - 1,
+        1. Let _nextArg_ be _args_[_k_].
+        1. <ins>If IsCodeLike(_nextArg_) is *false*, set _assembledFromCodeLike_ to *false*.</ins>
+        1. Let _nextArgString_ be ? ToString(_nextArg_).
+        1. Set _P_ to the string-concatenation of _P_, *","* (a comma), and _nextArgString_.
+        1. Set _k_ to _k_ + 1.
+      1. Let _bodyArg_ be _args_[_k_].
+      1. <ins>If IsCodeLike(_bodyArg_) is *false*, set _assembledFromCodeLike_ to *false*.</ins>
+    1. Let _bodyString_ be the string-concatenation of 0x000A (LINE FEED), ? ToString(_bodyArg_), and 0x000A (LINE FEED).
+    1. Let _prefix_ be the prefix associated with _kind_ in <emu-xref href="#table-dynamic-function-sourcetext-prefixes"></emu-xref>.
+    1. Let _sourceString_ be the string-concatenation of _prefix_, *" anonymous("*, _P_, 0x000A (LINE FEED), *") {"*, _bodyString_, and *"}"*.
+    1. <ins>Set _sourceString_ to be ? ToString(HostValidateDynamicCode(_callerRealm_, _calleeRealm_, _sourceString_, _assembledFromCodeLike_)). </ins>
     1. ...
   </emu-alg>
 </emu-clause>
 
-<h2>Changes to PerformEval</h2>
-
-<p>PerformEval now:</p>
-
-<ul>
-  <li>uses the new algorithm, IsCodeLike, instead of checking whether _x_ is a string, and</li>
-  <li>uses the adjusted host callout and finds the source text in its result.</li>
-</ul>
-
-<emu-clause id="sec-performeval" aoid="PerformEval">
-  <h1>Runtime Semantics: PerformEval ( _x_, _callerRealm_, _strictCaller_, _direct_ )</h1>
-  <p>The abstract operation PerformEval with arguments _x_, _callerRealm_, _strictCaller_, and _direct_ performs the following steps:</p>
-  <emu-alg>
-    1. Assert: If _direct_ is *false*, then _strictCaller_ is also *false*.
-    1. If <del>Type(_x_) is not String</del> <ins>IsCodeLike(_x_) is *false*</ins>, return _x_.
-    1. Let _evalRealm_ be the current Realm Record.
-    1. <ins>Let _args_ be a list containing only _x_.</ins>
-    1. <del>Perform ? HostEnsureCanCompileStrings(_callerRealm_, _calleeRealm_).</del><br>
-       <ins>Set _args_ to ! HostBeforeCompileValue(_callerRealm_, _calleeRealm_, |Script|, _args_).</ins>
-    1. <ins>Set _x_ to ? Get(_args_, 0).</ins>
-    1. ...
-  </emu-alg>
-
-<emu-clause id="sec-iscodelike" aoid="IsCodeLike">
-  <h1><ins>Runtime Semantics: IsCodeLike ( _x_ )</ins></h1>
-  <emu-note>There is no way for user code to define code-like values unless
-the host additionally provides API that affects the [[CodeLike]] internal
-slot. Proxies over code-like values are not themselves code-like.
-</emu-note>
-  <p><ins>The abstract operation IsCodeLike with argument _x_ performs the following steps:</ins></p>
-  <emu-alg>
-    1. <ins>If Type(_x_) is String, return *true*.</ins>
-    1. <ins>If Type(_x_) is Object, then</ins>
-      1. <ins>If _x_ has a [[CodeLike]] internal slot, then return *true*.
-    1. <ins>Return *false*.</ins>
-  </emu-alg>
-</emu-clause>
+<emu-annex id="sec-host-layering-points">
+  <h1>Host Layering Points</h1>
+  <emu-annex id="sec-host-defined-fields-summary">
+    <h1>Host-defined Fields</h1>
+    <p>
+    <ins>[[HostDefinedCodeLike]]: See IsCodeLike</ins>
+    </p>
+  </emu-annex>
+</emu-annex>
