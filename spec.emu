@@ -244,105 +244,17 @@ callout.</p>
     1. ...
   </emu-alg>
 
-  <emu-clause id="sec-iscodelike" aoid="IsCodeLike">
-    <h1><ins>Runtime Semantics: IsCodeLike ( _x_ )</ins></h1>
-    <p><ins>The abstract operation IsCodeLike with argument _x_ performs steps TBD (see options below).</ins></p>
-  </emu-clause>
-</emu-clause>
-
-
-<h2>Option 1 - Internal slot [[CodeLike]]</h2>
-
-<p>We could use an internal slot to distinguish code-like objects.</p>
-
-<p>
-With this approach, existing programs that assume that
-<code>typeof x === 'string' || eval(x) === x</code> will continue
-to have the same semantics since there's no existing APIs that
-create non-string code-like values.
-</p>
-
-<p>
-There is no way for user code to define code-like values unless
-we additionally provide APIs that affect the [[CodeLike]] internal
-slot.
-</p>
-
-<p>
-Proxies over code-like values are not themselves code-like.
-</p>
-
-<emu-clause id="sec-iscodelike-alternative1" aoid="IsCodeLikeAlternative">
+<emu-clause id="sec-iscodelike" aoid="IsCodeLike">
   <h1><ins>Runtime Semantics: IsCodeLike ( _x_ )</ins></h1>
+  <emu-note>There is no way for user code to define code-like values unless
+the host additionally provides API that affects the [[CodeLike]] internal
+slot. Proxies over code-like values are not themselves code-like.
+</emu-note>
   <p><ins>The abstract operation IsCodeLike with argument _x_ performs the following steps:</ins></p>
   <emu-alg>
     1. <ins>If Type(_x_) is String, return *true*.</ins>
     1. <ins>If Type(_x_) is Object, then</ins>
-       1. <ins>If _x_ has a [[CodeLike]] internal slot, then return *true*.
-    1. <ins>Return *false*.</ins>
-  </emu-alg>
-</emu-clause>
-
-<h2>Option 2 - Well known symbol</h2>
-
-<p>We could use a new well-known symbol to distinguish code-like objects.</p>
-
-<p>
-With this approach, existing programs that assume that
-<code>typeof x === 'string' || eval(x) === x</code> may have different
-semantics if they use <code>Symbol[key]</code> or equivalent to access
-the new well-known symbol and then attach that to objects.
-</p>
-
-<p>
-User code may define code-like values.
-</p>
-
-<p>
-Proxies over code-like values are themselves code-like.
-</p>
-
-<emu-clause id="sec-well-known-symbols">
-  <h1>Well-Known Symbols</h1>
-  <emu-table id="table-1" caption="Well-known Symbols">
-    <table>
-      <tbody>
-        <tr>
-          <th>
-            Specification Name
-          </th>
-          <th>
-            [[Description]]
-          </th>
-          <th>
-            Value and Purpose
-          </th>
-        </tr>
-        <tr>
-          <td>
-            <ins>@@evalable</ins>
-          </td>
-          <td>
-            <ins>`"Symbol.evalable"`</ins>
-          </td>
-          <td>
-            <ins>Boolean property that indicates whether the object may be
-            interpreted as code by `eval`.</ins>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </emu-table>
-</emu-clause>
-
-<emu-clause id="sec-iscodelike-alternative2" aoid="IsCodeLikeAlternative2">
-  <h1><ins>Runtime Semantics: IsCodeLike ( _x_ )</ins></h1>
-  <p><ins>The abstract operation IsCodeLike with argument _x_ performs the following steps:</ins></p>
-  <emu-alg>
-    1. <ins>If Type(_x_) is String, return *true*.</ins>
-    1. <ins>If Type(_x_) is Object, then</ins>
-       1. <ins>Let _evalable_ be ? Get(_x_, @@evalable).</ins>
-       1. <ins>Return ToBoolean(_evalable_).</ins>
+      1. <ins>If _x_ has a [[CodeLike]] internal slot, then return *true*.
     1. <ins>Return *false*.</ins>
   </emu-alg>
 </emu-clause>
