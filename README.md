@@ -13,8 +13,8 @@
 
 ## Status
 
-Champion(s): mikesamuel <br>
-Author(s): mikesamuel <br>
+Champion(s): koto<br>
+Author(s): mikesamuel, koto <br>
 Stage: [1](https://tc39.github.io/process-document/) <br>
 Spec: [ecmarkup output][draft spec], [source][]
 
