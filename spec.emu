@@ -16,6 +16,10 @@ contributors: Krzysztof Kotowicz, Mike Samuel
     1. <ins>If _x_ has a [[HostDefinedCodeLike]] internal slot, then return *true*.
     1. <ins>Return *false*.</ins>
   </emu-alg>
+  <emu-note>
+  Hosts should ascertain that objects with the [[HostDefinedCodeLike]] internal slot always coerce to the same string.
+  This is to allow for passing code-like objects without handing out capabilities to change the code that they wrap.
+  </emu-note>
 </emu-clause>
 
 <emu-clause id="sec-hostvalidatedynamiccode" aoid="HostValidateDynamicCode">
