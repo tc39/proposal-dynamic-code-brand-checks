@@ -131,9 +131,9 @@ but without changing the semantics of pre-existing programs.
 - Define `IsCodeLike(*x*)`, a spec abstraction that returns true for objects
   containing a host-defined internal slot (`[[HostDefinedCodeLike]]`).
 - Tweak `PerformEval`, which is called by both direct and indirect `eval`, to
-  use `IsCodeLike(*x*)` in addition to the existing (Type(_x_) is String).
+  use `IsCodeLike(*x*)` to extract a string from code-like objects before the
+  (Type(_x_) is String) check.
   Code-like objects and will not cause the early-exit.
-- Use ToString(_x_) for the code to parse after the code-like check.
 
 ##### Pros
 
@@ -259,7 +259,7 @@ protections enabled.
 
 ### Solution
 
-This proposal adjusts `eval` and `new Function` to expect return
+This proposal adjusts `eval` and `new Function` to expect return string
 values from the host callout and to use those in place of the inputs.
 
 ## Tests

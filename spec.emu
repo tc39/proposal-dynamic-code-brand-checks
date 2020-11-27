@@ -13,11 +13,11 @@ contributors: Krzysztof Kotowicz, Mike Samuel
   <h1><ins>Runtime Semantics: IsCodeLike ( _x_ )</ins></h1>
   <p><ins>The abstract operation IsCodeLike with arguments _x_ checks if _x_ contains the host-defined [[HostDefinedCodeLike]] internal slot. It performs the following steps:</ins></p>
   <emu-alg>
-    1. <ins>If _x_ has a [[HostDefinedCodeLike]] internal slot, then return *true*.
+    1. <ins>If _x_ has a [[HostDefinedCodeLike]] internal slot, and Type(_x_.[[HostDefinedCodeLike]]) is String then return *true*.
     1. <ins>Return *false*.</ins>
   </emu-alg>
   <emu-note>
-  Hosts should ascertain that objects with the [[HostDefinedCodeLike]] internal slot always coerce to the same string.
+  Hosts should ascertain that [[HostDefinedCodeLike]] internal slot value for objects doesn't change.
   This is to allow for passing code-like objects without handing out capabilities to change the code that they wrap.
   </emu-note>
 </emu-clause>
@@ -25,7 +25,7 @@ contributors: Krzysztof Kotowicz, Mike Samuel
 <emu-clause id="sec-hostvalidatedynamiccode" aoid="HostValidateDynamicCode">
         <h1><del>HostEnsureCanCompileStrings</del> <ins>HostValidateDynamicCode</ins> ( _callerRealm_, _calleeRealm_<ins>, _codeString_, _wasCodeLike_, _compilationSink_</ins>)</h1>
         <p><del>HostEnsureCanCompileStrings</del> <ins>HostValidateDynamicCode</ins> is a host-defined abstract operation that <ins>takes arguments _callerRealm_ (a Realm), _calleeRealm_ (a Realm), _codeString_ (a string), _wasCodeLike_ (a boolean), and _compilationSink_ (*"Function"* or *"eval"*) and </ins>allows host environments to <del>block</del><ins>guard</ins> certain ECMAScript functions which allow developers to compile strings into ECMAScript code. </p>
-        <p>An implementation of <del>HostEnsureCanCompileStrings</del> <ins>HostValidateDynamicCode</ins> may complete normally or abruptly. Any abrupt completions will be propagated to its callers. The default implementation of <del>HostEnsureCanCompileStrings</del><ins>HostValidateDynamicCode</ins> is to unconditionally return a NormalCompletion(_codeString_).</p>
+        <p>An implementation of <del>HostEnsureCanCompileStrings</del> <ins>HostValidateDynamicCode</ins> may complete normally or abruptly. <ins>Any normal completion must return a String.</ins> Any abrupt completions will be propagated to its callers. The default implementation of <del>HostEnsureCanCompileStrings</del><ins>HostValidateDynamicCode</ins> is to unconditionally return a NormalCompletion(_codeString_).</p>
 </emu-clause>
 
 
@@ -35,10 +35,11 @@ contributors: Krzysztof Kotowicz, Mike Samuel
   <emu-alg>
     1. Assert: If _direct_ is *false*, then _strictCaller_ is also *false*.
     1. <ins>Let _isCodeLike_  be ! IsCodeLike(_x_).</ins>
-    1. If Type(_x_) is not String <ins>and _isCodeLike_ is *false*</ins>, return _x_.
+    1. <ins>If _isCodeLike_ is *true*, set _x_ to _x_.[[HostDefinedCodeLike]].</ins>
+    1. If Type(_x_) is not String, return _x_.
     1. Let _evalRealm_ be the current Realm Record.
     1. <del>Perform ? HostEnsureCanCompileStrings(_callerRealm_, _calleeRealm_).</del><br>
-       <ins>Set _x_ to be ? ToString(HostValidateDynamicCode(_callerRealm_, _calleeRealm_, ToString(_x_), _isCodeLike_, *"eval"*)).</ins>
+       <ins>Set _x_ to be ? HostValidateDynamicCode(_callerRealm_, _calleeRealm_, _x_, _isCodeLike_, *"eval"*).</ins>
     1. ...
   </emu-alg>
 </emu-clause>
@@ -77,25 +78,25 @@ contributors: Krzysztof Kotowicz, Mike Samuel
     1. If _argCount_ = 0, let _bodyArg_ be the empty String.
     1. Else if _argCount_ = 1, <del>let _bodyArg_ be _args_[0]</del>.
       1. <ins>Let _bodyArg_ be _args_[0].</ins>
-      1. <ins>If IsCodeLike(_bodyArg_) is *false*, set _assembledFromCodeLike_ to *false*.</ins>
+      1. <ins>If IsCodeLike(_bodyArg_) is *true*, set _bodyArg_ to _bodyArg_.[[HostDefinedCodeLike]]. Otherwise, set _assembledFromCodeLike_ to *false*.</ins>
     1. Else,
       1. Assert: _argCount_ &gt; 1.
       1. Let _firstArg_ be _args_[0].
-      1. <ins>If IsCodeLike(_firstArg_) is *false*, set _assembledFromCodeLike_ to *false*.</ins>
+      1. <ins>If IsCodeLike(_firstArg_) is *true*, set _firstArg_ to _firstArg_.[[HostDefinedCodeLike]]. Otherwise, set _assembledFromCodeLike_ to *false*.</ins>
       1. Set _P_ to ? ToString(_firstArg_).
       1. Let _k_ be 1.
       1. Repeat, while _k_ &lt; _argCount_ - 1,
         1. Let _nextArg_ be _args_[_k_].
-        1. <ins>If IsCodeLike(_nextArg_) is *false*, set _assembledFromCodeLike_ to *false*.</ins>
+        1. <ins>If IsCodeLike(_nextArg_) is *true*, set _nextArg_ to _nextArg_.[[HostDefinedCodeLike]]. Otherwise, set _assembledFromCodeLike_ to *false*.</ins>
         1. Let _nextArgString_ be ? ToString(_nextArg_).
         1. Set _P_ to the string-concatenation of _P_, *","* (a comma), and _nextArgString_.
         1. Set _k_ to _k_ + 1.
       1. Let _bodyArg_ be _args_[_k_].
-      1. <ins>If IsCodeLike(_bodyArg_) is *false*, set _assembledFromCodeLike_ to *false*.</ins>
+      1. <ins>If IsCodeLike(_bodyArg_) is *true*, set _bodyArg_ to _bodyArg_.[[HostDefinedCodeLike]]. Otherwise, set _assembledFromCodeLike_ to *false*.</ins>
     1. Let _bodyString_ be the string-concatenation of 0x000A (LINE FEED), ? ToString(_bodyArg_), and 0x000A (LINE FEED).
     1. Let _prefix_ be the prefix associated with _kind_ in <emu-xref href="#table-dynamic-function-sourcetext-prefixes"></emu-xref>.
     1. Let _sourceString_ be the string-concatenation of _prefix_, *" anonymous("*, _P_, 0x000A (LINE FEED), *") {"*, _bodyString_, and *"}"*.
-    1. <ins>Set _sourceString_ to be ? ToString(HostValidateDynamicCode(_callerRealm_, _calleeRealm_, _sourceString_, _assembledFromCodeLike_, *"Function"*)). </ins>
+    1. <ins>Set _sourceString_ to be ? HostValidateDynamicCode(_callerRealm_, _calleeRealm_, _sourceString_, _assembledFromCodeLike_, *"Function"*). </ins>
     1. ...
   </emu-alg>
 </emu-clause>
@@ -105,7 +106,7 @@ contributors: Krzysztof Kotowicz, Mike Samuel
   <emu-annex id="sec-host-defined-fields-summary">
     <h1>Host-defined Fields</h1>
     <p>
-    <ins>[[HostDefinedCodeLike]]: See IsCodeLike</ins>
+    <ins>[[HostDefinedCodeLike]]: A string. See IsCodeLike.</ins>
     </p>
   </emu-annex>
 </emu-annex>
