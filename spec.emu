@@ -6,6 +6,7 @@
 <pre class="metadata">
 title: Dynamic Code Brand Checks
 stage: 1
+copyright: false
 contributors: Krzysztof Kotowicz, Mike Samuel
 </pre>
 
@@ -25,7 +26,7 @@ contributors: Krzysztof Kotowicz, Mike Samuel
 <emu-clause id="sec-hostvalidatedynamiccode" aoid="HostValidateDynamicCode">
         <h1><del>HostEnsureCanCompileStrings</del> <ins>HostValidateDynamicCode</ins> ( _callerRealm_, _calleeRealm_<ins>, _codeString_, _wasCodeLike_, _compilationSink_</ins>)</h1>
         <p><del>HostEnsureCanCompileStrings</del> <ins>HostValidateDynamicCode</ins> is a host-defined abstract operation that <ins>takes arguments _callerRealm_ (a Realm), _calleeRealm_ (a Realm), _codeString_ (a string), _wasCodeLike_ (a boolean), and _compilationSink_ (*"Function"* or *"eval"*) and </ins>allows host environments to <del>block</del><ins>guard</ins> certain ECMAScript functions which allow developers to compile strings into ECMAScript code. </p>
-        <p>An implementation of <del>HostEnsureCanCompileStrings</del> <ins>HostValidateDynamicCode</ins> may complete normally or abruptly. <ins>Any normal completion must return a String.</ins> Any abrupt completions will be propagated to its callers. The default implementation of <del>HostEnsureCanCompileStrings</del><ins>HostValidateDynamicCode</ins> is to unconditionally return a NormalCompletion(_codeString_).</p>
+        <p>An implementation of <del>HostEnsureCanCompileStrings</del> <ins>HostValidateDynamicCode</ins> may complete normally or abruptly. <ins>Any normal completion must return a String.</ins> Any abrupt completions will be propagated to its callers. The default implementation of <del>HostEnsureCanCompileStrings</del><ins>HostValidateDynamicCode</ins> is to unconditionally return a <del>empty normal completion</del><ins>NormalCompletion(_codeString_)</ins>.</p>
 </emu-clause>
 
 
