@@ -7,8 +7,7 @@
 - [Motivation](#motivation)
 - [Problem 1: %eval% does not accept objects in lieu of strings for code](#problem-1-eval-does-not-accept-objects-in-lieu-of-strings-for-code)
 - [Problem 2: Host callout does not receive type information](#problem-2-host-callout-does-not-receive-type-information)
-- [Problem 3: Host callout does not receive the code to check](#problem-3-host-callout-does-not-receive-the-code-to-check)
-- [Problem 4: Host callout cannot adjust values](#problem-4-host-callout-cannot-adjust-values)
+- [Problem 3: Host callout cannot adjust values](#problem-3-host-callout-cannot-adjust-values)
 - [Tests](#tests)
 
 ## Status
@@ -149,9 +148,9 @@ but without changing the semantics of pre-existing programs.
 ## Problem 2: Host callout does not receive type information
 
 Currently the information available to decide whether to allow compilation of
-a string is a pair of realms.
+a string is a realm, a list of strings, a string, and a boolean.
 
-> HostEnsureCanCompileStrings( _callerRealm_, _calleeRealm_ )
+> HostEnsureCanCompileStrings( __calleeRealm_, _parameterStrings_, _bodyString_: a String, _direct_ )
 >
 > HostEnsureCanCompileStrings is an implementation-defined abstract
 > operation that allows host environments to block certain ECMAScript
@@ -178,44 +177,7 @@ the Function constructor arguments passed the `IsCodeLike` check.
 
 - Requires changes to the host callout (see also below):
 
-## Problem 3: Host callout does not receive the code to check
-
-`HostEnsureCanCompileStrings` only passes the realm. In the web platform,
-that callout is hooked to the [Content Security Policy algorithms](https://w3c.github.io/webappsec-csp/#should-block-inline"), which take action based on _code_ that is to be executed - e.g. an eval() argument, or a dynamically-created function body, to be able to include that code in [violation reports](https://w3c.github.io/webappsec-csp/#security-violation-reports) ([CSP3's issue 8](https://www.w3.org/TR/CSP3/#issues-index))
-
-As such, some implementations (v8 and SpiderMonkey) actually also pass the code string
-to the host, and in the case of <code>new Function()</code> perform the callout
-later in `CreateDynamicFunction`, after the function body is assembled.
-
-### Solution
-
-This proposal updates the host callout to contain the code string to be executed,
-and moves the callout in `CreateDynamicFunction` after the function body is
-assembled.
-
-### Spec / implementation mismatch
-
-Moving the callout in CreateDynamicFunction changes the behavior in
-implementations that specify a non-default host callout.
-
-Currently the stringifier should not execute if the host disables the string
-compilation:
-
-```javascript
-new Function({
-  toString: () => {
-    throw "Should not happen, as the callout would reject this earlier";
-  },
-});
-```
-
-Current implementations differ in behavior. For example, v8 and Spidermonkey
-are not ES spec-compliant. JSC follows the spec - [In-browser proof of concept](https://gadgets.kotowicz.net/poc/createdynamicfunction.php).
-
-This proposal would cause the stringifier to execute _before_ the callout,
-making it possible for the browser hosts to actually follow the CSP spec.
-
-## Problem 4: Host callout cannot adjust values
+## Problem 3: Host callout cannot adjust values
 
 Trusted Types defines a [default policy][] to make it easier to
 migrate applications that pass around strings.
