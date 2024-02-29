@@ -129,7 +129,7 @@ Define a spec abstraction, _IsCodeLike_, that allows some object values through
 but without changing the semantics of pre-existing programs.
 
 - Define `IsCodeLike(*x*)`, a spec abstraction that returns true for objects
-  containing a host-defined internal slot (`[[HostDefinedCodeLike]]`).
+  containing a host-defined internal slot (`[[HostDefinedIsCodeLike]]`).
 - Tweak `PerformEval`, which is called by both direct and indirect `eval`, to
   use `IsCodeLike(*x*)` to extract a string from code-like objects before the
   (Type(_x_) is String) check.
