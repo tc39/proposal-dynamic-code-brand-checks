@@ -20,8 +20,8 @@ Spec: [ecmarkup output][draft spec], [source][]
 
 ## TL;DR
 
-Allow hosts to create _code-like_ objects and change _HostEnsureCanCompileStrings(callerRealm, calleeRealm)_ to _HostValidateDynamicCode(callerRealm, calleeRealm, codeString,
-wasCodeLike)_. Hosts can change the to code string to be compiled.
+Allow hosts to create _code-like_ objects and change _HostEnsureCanCompileStrings( calleeRealm, parameterStrings, bodyString, direct )_ to _HostEnsureCanCompileStrings( calleeRealm, parameterStrings, bodyString, codeString, compilationType, parameterArgs, bodyArg )_.
+Hosts can change the to code string to be compiled.
 
 ## Motivation
 
@@ -129,11 +129,9 @@ Define a spec abstraction, _IsCodeLike_, that allows some object values through
 but without changing the semantics of pre-existing programs.
 
 - Define `IsCodeLike(*x*)`, a spec abstraction that returns true for objects
-  containing a host-defined internal slot (`[[HostDefinedCodeLike]]`).
+  containing a host-defined internal slot (`[[HostDefinedIsCodeLike]]`).
 - Tweak `PerformEval`, which is called by both direct and indirect `eval`, to
-  use `IsCodeLike(*x*)` to extract a string from code-like objects before the
-  (Type(_x_) is String) check.
-  Code-like objects and will not cause the early-exit.
+  use `IsCodeLike(*x*)` to ensure Code-like objects will not cause the early-exit.
 
 ##### Pros
 
@@ -170,13 +168,13 @@ the Function constructor arguments passed the `IsCodeLike` check.
 
 ##### Pros
 
-- Simple host interface; Does not require passing objects to the host.
 - No TOCTOU issues - code-like object passing the check is immediately
   stringified before the host callout happens.
 
 ##### Cons
 
 - Requires changes to the host callout (see also below):
+- Complex host interface; Requires passing objects to the host.
 
 ## Problem 3: Host callout does not receive the full code to check
 
