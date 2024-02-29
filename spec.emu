@@ -12,7 +12,7 @@ contributors: Krzysztof Kotowicz, Mike Samuel
 
 <emu-clause id="sec-iscodelike" aoid="IsCodeLike">
   <h1><ins>Runtime Semantics: IsCodeLike ( _x_ )</ins></h1>
-  <p><ins>The abstract operation IsCodeLike with arguments _x_ checks if _x_ contains the host-defined [[HostDefinedIsCodeLike]] internal slot. It performs the following steps:</ins></p>
+  <p><ins>The abstract operation IsCodeLike takes argument _x_ (an Object) and returns a Boolean. It checks if _x_ contains the host-defined [[HostDefinedIsCodeLike]] internal slot. It performs the following steps:</ins></p>
   <emu-alg>
     1. <ins>If _x_ hasn't got a [[HostDefinedIsCodeLike]] internal slot, return *false*.</ins>
     1. <ins>Assert that _x_.[[HostDefinedIsCodeLike]] is a Boolean.</ins>
@@ -66,7 +66,8 @@ contributors: Krzysztof Kotowicz, Mike Samuel
 </dl>
 <emu-alg>
   1. Assert: If _direct_ is *false*, then _strictCaller_ is also *false*.
-  1. <ins>Let _isCodeLike_  be ! IsCodeLike(_x_).</ins>
+  1. <ins>If _x_ is an Object, set _isCodeLike_ to ! IsCodeLike(_x_).</ins>
+  1. <ins>Else, set _isCodeLike_ to *false*.</ins>
   1. <ins>If _x_ is not a String, and _isCodeLike_ is *false*, return _x_.</ins>
   1. <ins>If _x_ is a String, set _xStr_ to _x_.</ins>
   1. <ins>Else, set _xStr_ to ? ToString(_x_).</ins>
@@ -122,10 +123,10 @@ contributors: Krzysztof Kotowicz, Mike Samuel
       1. Let _parameterSym_ be the grammar symbol |FormalParameters[+Yield, +Await]|.
       1. Let _fallbackProto_ be *"%AsyncGeneratorFunction.prototype%"*.
     1. Let _argCount_ be the number of elements in _parameterArgs_.
-    1. Let _bodyString_ be ? ToString(_bodyArg_).
     1. Let _parameterStrings_ be a new empty List.
     1. For each element _arg_ of _parameterArgs_, do
       1. Append ? ToString(_arg_) to _parameterStrings_.
+    1. Let _bodyString_ be ? ToString(_bodyArg_).
     1. Let _currentRealm_ be the current Realm Record.
     1. <del>Perform ? <del>HostEnsureCanCompileStrings(_currentRealm_, _parameterStrings_, _bodyString_, *false*).</del>
     1. Let _P_ be the empty String.
