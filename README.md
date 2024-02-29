@@ -186,53 +186,6 @@ This proposal updates the host callout to contain the full code string to be exe
 and moves the callout in `CreateDynamicFunction` after the function body is
 assembled.
 
-## Problem 4: Host callout cannot adjust values
-
-Trusted Types defines a [default policy][] to make it easier to
-migrate applications that pass around strings.
-
-This policy is invoked when a string value reaches a sink, so any default policy's
-[`createScript` callback][createscript callback] is invoked on `eval(myString)`.
-
-If the callback throws an error, then `eval` should be blocked. But
-if the callback returns a value, _result_, then ToString(_result_)
-should be used as the source text to parse.
-
-For example, if the default policy's `createScript` callback returns `"output"` given
-`"input"` then `eval("input")` would load and run a |ScriptBody| parsed from the source text
-`output`.
-
-</p>
-
-```html
-<script>
-  // Define a default policy that maps the source text `input` to `output`.
-  window.trustedTypes.createPolicy("default", {
-    createScript(code) {
-      if (code === "input") {
-        return "output";
-      }
-      throw new Error("blocked script execution");
-    },
-  });
-
-  globalThis.input = 1;
-  globalThis.output = 2;
-  // The source text loaded is `output`
-  eval("input") === globalThis.output; // true
-</script>
-```
-
-Being able to adjust the code that runs provides the maximum
-flexibility when dealing with a thorny legacy module that might
-otherwise prevent the entire application from running with XSS
-protections enabled.
-
-### Solution
-
-This proposal adjusts `eval` and `new Function` to expect return string
-values from the host callout and to use those in place of the inputs.
-
 ## Tests
 
 Related tests at
