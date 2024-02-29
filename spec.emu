@@ -14,12 +14,12 @@ contributors: Krzysztof Kotowicz, Mike Samuel
   <h1><ins>Runtime Semantics: IsCodeLike ( _x_ )</ins></h1>
   <p><ins>The abstract operation IsCodeLike takes argument _x_ (an Object) and returns a Boolean. It checks if _x_ contains the host-defined [[HostDefinedIsCodeLike]] internal slot. It performs the following steps:</ins></p>
   <emu-alg>
-    1. <ins>If _x_ hasn't got a [[HostDefinedIsCodeLike]] internal slot, return *false*.</ins>
-    1. <ins>Assert that _x_.[[HostDefinedIsCodeLike]] is a Boolean.</ins>
+    1. <ins>If _x_ does not have a [[HostDefinedIsCodeLike]] internal slot, return *false*.</ins>
+    1. <ins>Assert _x_.[[HostDefinedIsCodeLike]] is a Boolean.</ins>
     1. <ins>Return _x_.[[HostDefinedIsCodeLike]].</ins>
   </emu-alg>
   <emu-note>
-  Hosts should ascertain that [[HostDefinedIsCodeLike]] internal slot value for objects doesn't change.
+  Hosts should ensure that [[HostDefinedIsCodeLike]] internal slot value for objects doesn't change.
   This is to allow for passing code-like objects without handing out capabilities to change the code that they wrap.
   </emu-note>
 </emu-clause>

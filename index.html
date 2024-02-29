@@ -3026,9 +3026,9 @@ li.menu-search-result-term:before {
 <emu-clause id="sec-iscodelike" aoid="IsCodeLike">
   <h1><span class="secnum">1</span> <ins>Runtime Semantics: IsCodeLike ( <var>x</var> )</ins></h1>
   <p><ins>The abstract operation IsCodeLike takes argument <var>x</var> (an Object) and returns a Boolean. It checks if <var>x</var> contains the host-defined <var class="field">[[HostDefinedIsCodeLike]]</var> internal slot. It performs the following steps:</ins></p>
-  <emu-alg><ol><li><ins>If <var>x</var> hasn't got a <var class="field">[[HostDefinedIsCodeLike]]</var> internal slot, return <emu-val>false</emu-val>.</ins></li><li><ins>Assert that <var>x</var>.<var class="field">[[HostDefinedIsCodeLike]]</var> is a Boolean.</ins></li><li><ins>Return <var>x</var>.<var class="field">[[HostDefinedIsCodeLike]]</var>.</ins></li></ol></emu-alg>
+  <emu-alg><ol><li><ins>If <var>x</var> does not have a <var class="field">[[HostDefinedIsCodeLike]]</var> internal slot, return <emu-val>false</emu-val>.</ins></li><li><ins>Assert <var>x</var>.<var class="field">[[HostDefinedIsCodeLike]]</var> is a Boolean.</ins></li><li><ins>Return <var>x</var>.<var class="field">[[HostDefinedIsCodeLike]]</var>.</ins></li></ol></emu-alg>
   <emu-note><span class="note">Note</span><div class="note-contents">
-  Hosts should ascertain that <var class="field">[[HostDefinedIsCodeLike]]</var> internal slot value for objects doesn't change.
+  Hosts should ensure that <var class="field">[[HostDefinedIsCodeLike]]</var> internal slot value for objects doesn't change.
   This is to allow for passing code-like objects without handing out capabilities to change the code that they wrap.
   </div></emu-note>
 </emu-clause>
