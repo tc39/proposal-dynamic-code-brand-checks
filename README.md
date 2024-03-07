@@ -7,8 +7,7 @@
 - [Motivation](#motivation)
 - [Problem 1: %eval% does not accept objects in lieu of strings for code](#problem-1-eval-does-not-accept-objects-in-lieu-of-strings-for-code)
 - [Problem 2: Host callout does not receive type information](#problem-2-host-callout-does-not-receive-type-information)
-- [Problem 3: Host callout does not receive the code to check](#problem-3-host-callout-does-not-receive-the-code-to-check)
-- [Problem 4: Host callout cannot adjust values](#problem-4-host-callout-cannot-adjust-values)
+- [Problem 3: Host callout does not receive the full code to check](#problem-3-host-callout-does-not-receive-the-full-code-to-check)
 - [Tests](#tests)
 
 ## Status
