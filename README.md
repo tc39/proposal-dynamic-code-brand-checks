@@ -82,7 +82,7 @@ been explicitly trusted.
 
 Specifically, when Trusted Types enforcement is turned on, it would like to ensure
 that arguments to <code>eval()</code> and <code>new Function()</code> are
-(or are convertible to) a [TrustedScript](https://w3c.github.io/webappsec-trusted-types/dist/spec/#typedef-trustedscript) - an object wrapping around a string stored in an internal,
+(or are convertible to) a [TrustedScript](https://w3c.github.io/trusted-types/dist/spec/#typedefdef-trustedtype) - an object wrapping around a string stored in an internal,
 immutable slot. This enhances the existing dynamic code evaluation guards that the web platform already has with [CSP](https://www.w3.org/TR/CSP3/) (Trusted Types also integrates with other CSP mechanisms).
 
 This proposal seeks to solve the following problems:
@@ -196,8 +196,8 @@ but testing these require affecting the behavior of host callouts so will probab
 be specified as [web-platform-tests](https://github.com/web-platform-tests/wpt).
 
 [core-js-example]: https://github.com/zloirock/core-js/blob/2a005abe68520248d4431cab70d86e40b55d6e98/packages/core-js/internals/global.js#L5
-[tt]: https://w3c.github.io/webappsec-trusted-types/dist/spec/
+[tt]: https://w3c.github.io/trusted-types/dist/spec/
 [source]: https://github.com/tc39/proposal-dynamic-code-brand-checks/blob/master/spec.emu
-[default policy]: https://w3c.github.io/webappsec-trusted-types/dist/spec/#default-policy-hdr
-[createscript callback]: https://w3c.github.io/webappsec-trusted-types/dist/spec/#callbackdef-createscriptcallback
+[default policy]: https://w3c.github.io/trusted-types/dist/spec/#default-policy-hdr
+[createscript callback]: https://w3c.github.io/trusted-types/dist/spec/#callbackdef-createscriptcallback
 [draft spec]: https://tc39.es/proposal-dynamic-code-brand-checks/
