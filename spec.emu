@@ -24,9 +24,9 @@ contributors: Krzysztof Kotowicz, Mike Samuel
   </emu-note>
 </emu-clause>
 
-<emu-clause id="sec-hostvalidatedynamiccode" type="host-defined abstract operation">
+<emu-clause id="sec-hostensurecancompilestrings" type="host-defined abstract operation">
 <h1>
-  <del>HostEnsureCanCompileStrings</del> <ins>HostValidateDynamicCode</ins> (
+  HostEnsureCanCompileStrings (
     _calleeRealm_: a Realm Record,
     _parameterStrings_: a List of Strings,
     _bodyString_: a String,
@@ -34,12 +34,12 @@ contributors: Krzysztof Kotowicz, Mike Samuel
     <ins>_codeString_: a String,</ins>
     <ins>_compilationType_: ~DIRECT-EVAL~, ~INDIRECT-EVAL~, or ~FUNCTION~,</ins>
     <ins>_parameterArgs_: a List of ECMAScript language values,</ins>
-    <ins>_bodyArg_: a List of ECMAScript language values,</ins>
-  ): either a normal completion containing <del>~unused</del><ins>a String</ins> or a throw completion
+    <ins>_bodyArg_: an ECMAScript language value,</ins>
+  ): either a normal completion containing ~UNUSED~ or a throw completion
 </h1>
 <dl class="header">
   <dt>description</dt>
-  <dd>It allows host environments to <ins>guard</ins><del>block</del> certain ECMAScript functions which allow developers to interpret and evaluate strings as ECMAScript code.</dd>
+  <dd>It allows host environments to block certain ECMAScript functions which allow developers to interpret and evaluate strings as ECMAScript code.</dd>
 </dl>
 <p>
   _parameterStrings_ represents the strings that, when using one of the function constructors, will be concatenated together to build the parameters list.
@@ -50,7 +50,7 @@ contributors: Krzysztof Kotowicz, Mike Samuel
   _parameterArgs_ represents the list of values passed when using one of the function constructors,
   _bodyArg_ represents the function body or the value passed to an `eval` call.</ins>
 </p>
-<p>The default implementation of <del>HostEnsureCanCompileStrings</del><ins>HostValidateDynamicCode</ins> is to return NormalCompletion(_codeString_).</p>
+<p>The default implementation of HostEnsureCanCompileStrings is to return NormalCompletion(~UNUSED~).</p>
 </emu-clause>
 
 
@@ -74,9 +74,8 @@ contributors: Krzysztof Kotowicz, Mike Samuel
   1. <del>If _x_ is not a String, return _x_.</del>
   1. Let _evalRealm_ be the current Realm Record.
   1. NOTE: In the case of a direct eval, _evalRealm_ is the realm of both the caller of `eval` and of the `eval` function itself.
-  1. <del>Perform ? HostEnsureCanCompileStrings(_evalRealm_, « », _x_, _direct_).</del><br>
   1. <ins>Set _type_ to ~DIRECT-EVAL~ if _direct_ is *true*, or ~INDIRECT-EVAL~ if _direct_ is *false*.</ins>
-  1. <ins>Set _x_ to be ? HostValidateDynamicCode(_evalRealm_, « », _xStr_, _xStr_, _type_, « », _x_).</ins>
+  1. Perform ? HostEnsureCanCompileStrings(_evalRealm_, « », <del>_x_, _direct_</del><ins>_xStr_, _xStr_, _type_, « », _x_</ins>).<br>
   1. ...
 </emu-alg>
 </emu-clause>
@@ -128,7 +127,7 @@ contributors: Krzysztof Kotowicz, Mike Samuel
       1. Append ? ToString(_arg_) to _parameterStrings_.
     1. Let _bodyString_ be ? ToString(_bodyArg_).
     1. Let _currentRealm_ be the current Realm Record.
-    1. <del>Perform ? <del>HostEnsureCanCompileStrings(_currentRealm_, _parameterStrings_, _bodyString_, *false*).</del>
+    1. <del>Perform ? HostEnsureCanCompileStrings(_currentRealm_, _parameterStrings_, _bodyString_, *false*).</del>
     1. Let _P_ be the empty String.
     1. If _argCount_ > 0, then
       1. Set _P_ to _parameterStrings_[0].
@@ -139,7 +138,7 @@ contributors: Krzysztof Kotowicz, Mike Samuel
         1. Set _k_ to _k_ + 1.
     1. Let _bodyParseString_ be the string-concatenation of 0x000A (LINE FEED), _bodyString_, and 0x000A (LINE FEED).
     1. Let _sourceString_ be the string-concatenation of _prefix_, *" anonymous("*, _P_, 0x000A (LINE FEED), *") {"*, _bodyParseString_, and *"}"*.
-    1. <ins>Set _sourceString_ to ? HostValidateDynamicCode(_currentRealm_, _parameterStrings_, _bodyString_, _sourceString_, ~FUNCTION~, _parameterArgs_, _bodyArg_).</ins>
+    1. <ins>Perform ? HostEnsureCanCompileStrings(_currentRealm_, _parameterStrings_, _bodyString_, _sourceString_, ~FUNCTION~, _parameterArgs_, _bodyArg_).</ins>
     1. ...
   </emu-alg>
   <emu-note>
