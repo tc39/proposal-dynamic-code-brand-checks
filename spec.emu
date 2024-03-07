@@ -66,12 +66,13 @@ contributors: Krzysztof Kotowicz, Mike Samuel
 </dl>
 <emu-alg>
   1. Assert: If _direct_ is *false*, then _strictCaller_ is also *false*.
-  1. <ins>If _x_ is an Object, set _isCodeLike_ to ! IsCodeLike(_x_).</ins>
-  1. <ins>Else, set _isCodeLike_ to *false*.</ins>
-  1. <ins>If _x_ is not a String, and _isCodeLike_ is *false*, return _x_.</ins>
-  1. <ins>If _x_ is a String, set _xStr_ to _x_.</ins>
-  1. <ins>Else, set _xStr_ to ? ToString(_x_).</ins>
   1. <del>If _x_ is not a String, return _x_.</del>
+  1. <ins>If _x_ is an Object and ! IsCodeLike(_x_) is *true*, then</ins>
+    1. <ins>Let _xStr_ be ? ToString(_x_).</ins>
+  1. <ins>Else, if _x_ is a String, then</ins>
+    1. <ins>Let _xStr_ be _x_.</ins>
+  1. <ins>Else,</ins>
+    1. <ins>Return _x_.</ins>
   1. Let _evalRealm_ be the current Realm Record.
   1. NOTE: In the case of a direct eval, _evalRealm_ is the realm of both the caller of `eval` and of the `eval` function itself.
   1. <ins>Set _type_ to ~DIRECT-EVAL~ if _direct_ is *true*, or ~INDIRECT-EVAL~ if _direct_ is *false*.</ins>
