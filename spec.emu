@@ -5,23 +5,26 @@
 <script src="./spec.js"></script>
 <pre class="metadata">
 title: Dynamic Code Brand Checks
-stage: 1
+stage: 3
 copyright: false
-contributors: Krzysztof Kotowicz, Mike Samuel
+contributors: Krzysztof Kotowicz, Mike Samuel, Luke Warlow
 </pre>
 
-<emu-clause id="sec-iscodelike" aoid="IsCodeLike">
-  <h1><ins>Runtime Semantics: IsCodeLike ( _x_ )</ins></h1>
-  <p><ins>The abstract operation IsCodeLike takes argument _x_ (an Object) and returns a Boolean. It checks if _x_ contains the host-defined [[HostDefinedIsCodeLike]] internal slot. It performs the following steps:</ins></p>
-  <emu-alg>
-    1. <ins>If _x_ does not have a [[HostDefinedIsCodeLike]] internal slot, return *false*.</ins>
-    1. <ins>Assert _x_.[[HostDefinedIsCodeLike]] is a Boolean.</ins>
-    1. <ins>Return _x_.[[HostDefinedIsCodeLike]].</ins>
-  </emu-alg>
-  <emu-note>
-  Hosts should ensure that [[HostDefinedIsCodeLike]] internal slot value for objects doesn't change.
-  This is to allow for passing code-like objects without handing out capabilities to change the code that they wrap.
-  </emu-note>
+<emu-clause id="sec-hostgetcodeforeval" type="host-defined abstract operation">
+  <h1>
+    HostGetCodeForEval (
+      _argument_: an Object,
+    ): a String or ~no-code~
+  </h1>
+  <dl class="header">
+    <dt>description</dt>
+    <dd>It allows host environments to return a String of code from _argument_ to be used by eval,
+    rather than eval returning _argument_.</dd>
+  </dl>
+  <p>
+    _argument_ represents the Object to be checked for code.
+  </p>
+  <p>The default implementation of HostGetCodeForEval is to return ~no-code~.</p>
 </emu-clause>
 
 <emu-clause id="sec-hostensurecancompilestrings" type="host-defined abstract operation">
@@ -31,8 +34,7 @@ contributors: Krzysztof Kotowicz, Mike Samuel
     _parameterStrings_: a List of Strings,
     _bodyString_: a String,
     <del>_direct_: a Boolean,</del>
-    <ins>_codeString_: a String,</ins>
-    <ins>_compilationType_: ~DIRECT-EVAL~, ~INDIRECT-EVAL~, or ~FUNCTION~,</ins>
+    <ins>_compilationType_: ~direct-eval~, ~indirect-eval~, or ~function~,</ins>
     <ins>_parameterArgs_: a List of ECMAScript language values,</ins>
     <ins>_bodyArg_: an ECMAScript language value,</ins>
   ): either a normal completion containing ~UNUSED~ or a throw completion
@@ -45,10 +47,9 @@ contributors: Krzysztof Kotowicz, Mike Samuel
   _parameterStrings_ represents the strings that, when using one of the function constructors, will be concatenated together to build the parameters list.
   _bodyString_ represents the function body or the string passed to an `eval` call.
   <del>_direct_ signifies whether the evaluation is a direct eval.</del>
-  <ins>_codeString_ represents the full code string,</ins>
   <ins>_compilationType_ is an enum that indicates what type of compilation this is,
-  _parameterArgs_ represents the list of values passed when using one of the function constructors,
-  _bodyArg_ represents the function body or the value passed to an `eval` call.</ins>
+  _parameterArgs_ are the values passed as the leading parameters to one of the Function constructors.
+  _bodyArg_ is either the final parameter passed to one of the Function constructors or the value passed to an `eval` call.</ins>
 </p>
 <p>The default implementation of HostEnsureCanCompileStrings is to return NormalCompletion(~UNUSED~).</p>
 </emu-clause>
@@ -59,13 +60,21 @@ contributors: Krzysztof Kotowicz, Mike Samuel
   PerformEval (
     _x_: an ECMAScript language value,
     _strictCaller_: a Boolean,
-    _direct_: a Boolean,
+    _direct_: ~direct-eval~ or ~indirect-eval~,
   ): either a normal completion containing an ECMAScript language value or a throw completion
 </h1>
 <dl class="header">
 </dl>
 <emu-alg>
-  1. Assert: If _direct_ is *false*, then _strictCaller_ is also *false*.
+  1. Assert: If _direct_ is ~indirect-eval~, then _strictCaller_ is also *false*.
+  1. <ins>If _x_ is a String, then</ins>
+    1. <ins>Let _xStr_ be _x_.</ins>
+  1. <ins>Else if _x_ is an Object, then</ins>
+    1. <ins>Let _code_ be HostGetCodeForEval(_x_).</ins>
+    1. <ins>If _code_ is a String, let _xStr_ be _code_.</ins>
+    1. <ins>Else, return _x_.</ins>
+  1. <ins>Else,</ins>
+    1. <ins>Return _x_.</ins>
   1. <del>If _x_ is not a String, return _x_.</del>
   1. <ins>If _x_ is an Object and ! IsCodeLike(_x_) is *true*, then</ins>
     1. <ins>Let _xStr_ be ? ToString(_x_).</ins>
@@ -75,8 +84,7 @@ contributors: Krzysztof Kotowicz, Mike Samuel
     1. <ins>Return _x_.</ins>
   1. Let _evalRealm_ be the current Realm Record.
   1. NOTE: In the case of a direct eval, _evalRealm_ is the realm of both the caller of `eval` and of the `eval` function itself.
-  1. <ins>Set _type_ to ~DIRECT-EVAL~ if _direct_ is *true*, or ~INDIRECT-EVAL~ if _direct_ is *false*.</ins>
-  1. Perform ? HostEnsureCanCompileStrings(_evalRealm_, « », <del>_x_, _direct_</del><ins>_xStr_, _xStr_, _type_, « », _x_</ins>).<br>
+  1. Perform ? HostEnsureCanCompileStrings(_evalRealm_, « », <del>_x_</del> <ins>_xStr_,</ins> _direct_<ins>, « », _x_</ins>).<br>
   1. ...
 </emu-alg>
 </emu-clause>
@@ -128,18 +136,7 @@ contributors: Krzysztof Kotowicz, Mike Samuel
       1. Append ? ToString(_arg_) to _parameterStrings_.
     1. Let _bodyString_ be ? ToString(_bodyArg_).
     1. Let _currentRealm_ be the current Realm Record.
-    1. <del>Perform ? HostEnsureCanCompileStrings(_currentRealm_, _parameterStrings_, _bodyString_, *false*).</del>
-    1. Let _P_ be the empty String.
-    1. If _argCount_ > 0, then
-      1. Set _P_ to _parameterStrings_[0].
-      1. Let _k_ be 1.
-      1. Repeat, while _k_ &lt; _argCount_,
-        1. Let _nextArgString_ be _parameterStrings_[_k_].
-        1. Set _P_ to the string-concatenation of _P_, *","* (a comma), and _nextArgString_.
-        1. Set _k_ to _k_ + 1.
-    1. Let _bodyParseString_ be the string-concatenation of 0x000A (LINE FEED), _bodyString_, and 0x000A (LINE FEED).
-    1. Let _sourceString_ be the string-concatenation of _prefix_, *" anonymous("*, _P_, 0x000A (LINE FEED), *") {"*, _bodyParseString_, and *"}"*.
-    1. <ins>Perform ? HostEnsureCanCompileStrings(_currentRealm_, _parameterStrings_, _bodyString_, _sourceString_, ~FUNCTION~, _parameterArgs_, _bodyArg_).</ins>
+    1. Perform ? HostEnsureCanCompileStrings(_currentRealm_, _parameterStrings_, _bodyString_, <del>*false*</del><ins> ~function~, _parameterArgs_, _bodyArg_</ins>).
     1. ...
   </emu-alg>
   <emu-note>
@@ -149,10 +146,8 @@ contributors: Krzysztof Kotowicz, Mike Samuel
 
 <emu-annex id="sec-host-layering-points">
   <h1>Host Layering Points</h1>
-  <emu-annex id="sec-host-defined-fields-summary">
-    <h1>Host-defined Fields</h1>
-    <p>
-    <ins>[[HostDefinedIsCodeLike]]: A Boolean. See IsCodeLike.</ins>
-    </p>
+  <emu-annex id="sec-host-hooks-summary">
+    <h1>Host Hooks</h1>
+    <p><ins><b>HostGetCodeForEval(...)</b></ins></p>
   </emu-annex>
 </emu-annex>
