@@ -7,20 +7,18 @@
 - [Motivation](#motivation)
 - [Problem 1: %eval% does not accept objects in lieu of strings for code](#problem-1-eval-does-not-accept-objects-in-lieu-of-strings-for-code)
 - [Problem 2: Host callout does not receive type information](#problem-2-host-callout-does-not-receive-type-information)
-- [Problem 3: Host callout does not receive the full code to check](#problem-3-host-callout-does-not-receive-the-full-code-to-check)
 - [Tests](#tests)
 
 ## Status
 
 Champion(s): koto<br>
 Author(s): mikesamuel, koto <br>
-Stage: [1](https://tc39.github.io/process-document/) <br>
+Stage: [3](https://tc39.github.io/process-document/) <br>
 Spec: [ecmarkup output][draft spec], [source][]
 
 ## TL;DR
 
-Allow hosts to create _code-like_ objects and change _HostEnsureCanCompileStrings( calleeRealm, parameterStrings, bodyString, direct )_ to _HostEnsureCanCompileStrings( calleeRealm, parameterStrings, bodyString, codeString, compilationType, parameterArgs, bodyArg )_.
-Hosts can change the to code string to be compiled.
+Allow hosts to create _code-like_ objects and change _HostEnsureCanCompileStrings( calleeRealm, parameterStrings, bodyString, direct )_ to _HostEnsureCanCompileStrings( calleeRealm, parameterStrings, bodyString, compilationType, parameterArgs, bodyArg )_.
 
 ## Motivation
 
@@ -127,14 +125,14 @@ non-string value that existing applications might create.
 Define a spec abstraction, _IsCodeLike_, that allows some object values through
 but without changing the semantics of pre-existing programs.
 
-- Define `IsCodeLike(*x*)`, a spec abstraction that returns true for objects
-  containing a host-defined internal slot (`[[HostDefinedIsCodeLike]]`).
+- Define `HostGetCodeForEval(*x*)`, a spec abstraction that returns the code string for objects
+  that should evaluate.
 - Tweak `PerformEval`, which is called by both direct and indirect `eval`, to
-  use `IsCodeLike(*x*)` to ensure Code-like objects will not cause the early-exit.
+  use `HostGetCodeForEval(*x*)` to ensure Code-like objects will not cause the early-exit.
 
 ##### Pros
 
-- `IsCodeLike` has no observable side effect for values. eval is backwards
+- `HostGetCodeForEval` has no observable side effect for values. eval is backwards
   compatible when a program produces no code like values.
 - User code can only create code-like values via host-defined APIs.
 
@@ -162,28 +160,13 @@ type information is needed.
 
 This proposal aims to provide additional context to `HostEnsureCanCompileStrings`,
 and reorder the steps in `CreateDynamicFunction` so that `HostEnsureCanCompileStrings`
-receives runtime type information - namely, whether the `eval` argument, or all
-the Function constructor arguments passed the `IsCodeLike` check.
-
-##### Pros
-
-- No TOCTOU issues - code-like object passing the check is immediately
-  stringified before the host callout happens.
+receives runtime type information - namely, the `eval` argument, or all
+the Function constructor arguments.
 
 ##### Cons
 
 - Requires changes to the host callout (see also below):
 - Complex host interface; Requires passing objects to the host.
-
-## Problem 3: Host callout does not receive the full code to check
-
-`HostEnsureCanCompileStrings` is called with parameters for the source code, but they're not in a unified string.
-
-### Solution
-
-This proposal updates the host callout to contain the full code string to be executed,
-and moves the callout in `CreateDynamicFunction` after the function body is
-assembled.
 
 ## Tests
 
