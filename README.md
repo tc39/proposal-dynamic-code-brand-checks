@@ -7,6 +7,7 @@
 - [Motivation](#motivation)
 - [Problem 1: %eval% does not accept objects in lieu of strings for code](#problem-1-eval-does-not-accept-objects-in-lieu-of-strings-for-code)
 - [Problem 2: Host callout does not receive type information](#problem-2-host-callout-does-not-receive-type-information)
+- [Problem 3: Host callout does not receive the full code to check](#problem-3-host-callout-does-not-receive-the-full-code-to-check)
 - [Tests](#tests)
 
 ## Status
@@ -18,7 +19,7 @@ Spec: [ecmarkup output][draft spec], [source][]
 
 ## TL;DR
 
-Allow hosts to create _code-like_ objects and change _HostEnsureCanCompileStrings( calleeRealm, parameterStrings, bodyString, direct )_ to _HostEnsureCanCompileStrings( calleeRealm, parameterStrings, bodyString, compilationType, parameterArgs, bodyArg )_.
+Allow hosts to create _code-like_ objects and change _HostEnsureCanCompileStrings( calleeRealm, parameterStrings, bodyString, direct )_ to _HostEnsureCanCompileStrings( calleeRealm, parameterStrings, bodyString, codeString, compilationType, parameterArgs, bodyArg )_.
 
 ## Motivation
 
@@ -167,6 +168,16 @@ the Function constructor arguments.
 
 - Requires changes to the host callout (see also below):
 - Complex host interface; Requires passing objects to the host.
+
+## Problem 3: Host callout does not receive the full code to check
+
+`HostEnsureCanCompileStrings` is called with parameters for the source code, but they're not in a unified string.
+
+### Solution
+
+This proposal updates the host callout to contain the full code string to be executed,
+and moves the callout in `CreateDynamicFunction` after the function body is
+assembled.
 
 ## Tests
 
