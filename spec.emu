@@ -35,7 +35,7 @@ contributors: Krzysztof Kotowicz, Mike Samuel, Luke Warlow
     _bodyString_: a String,
     <del>_direct_: a Boolean,</del>
     <ins>_codeString_: a String,</ins>
-    <ins>_compilationType_: ~direct-eval~, ~indirect-eval~, or ~function~,</ins>
+    <ins>_compilationType_: ~direct-eval~, ~indirect-eval~, ~timer~, or ~function~,</ins>
     <ins>_parameterArgs_: a List of ECMAScript language values,</ins>
     <ins>_bodyArg_: an ECMAScript language value,</ins>
   ): either a normal completion containing ~UNUSED~ or a throw completion
