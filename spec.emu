@@ -78,12 +78,6 @@ contributors: Krzysztof Kotowicz, Mike Samuel, Luke Warlow
   1. <ins>Else,</ins>
     1. <ins>Return _x_.</ins>
   1. <del>If _x_ is not a String, return _x_.</del>
-  1. <ins>If _x_ is an Object and ! IsCodeLike(_x_) is *true*, then</ins>
-    1. <ins>Let _xStr_ be ? ToString(_x_).</ins>
-  1. <ins>Else, if _x_ is a String, then</ins>
-    1. <ins>Let _xStr_ be _x_.</ins>
-  1. <ins>Else,</ins>
-    1. <ins>Return _x_.</ins>
   1. Let _evalRealm_ be the current Realm Record.
   1. NOTE: In the case of a direct eval, _evalRealm_ is the realm of both the caller of `eval` and of the `eval` function itself.
   1. Perform ? HostEnsureCanCompileStrings(_evalRealm_, « », <del>_x_</del> <ins>_xStr_, _xStr_,</ins> _direct_<ins>, « », _x_</ins>).<br>
