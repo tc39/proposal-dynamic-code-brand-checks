@@ -81,6 +81,21 @@ contributors: Krzysztof Kotowicz, Mike Samuel, Luke Warlow
   1. Let _evalRealm_ be the current Realm Record.
   1. NOTE: In the case of a direct eval, _evalRealm_ is the realm of both the caller of `eval` and of the `eval` function itself.
   1. Perform ? HostEnsureCanCompileStrings(_evalRealm_, « », <del>_x_</del> <ins>_xStr_, _xStr_,</ins> _direct_<ins>, « », _x_</ins>).<br>
+  1. Let _inFunction_ be *false*.
+  1. Let _inMethod_ be *false*.
+  1. Let _inDerivedConstructor_ be *false*.
+  1. Let _inClassFieldInitializer_ be *false*.
+  1. If _direct_ is ~direct-eval~, then
+    1. Let _thisEnvRec_ be GetThisEnvironment().
+    1. If _thisEnvRec_ is a Function Environment Record, then
+      1. Let _F_ be _thisEnvRec_.[[FunctionObject]].
+      1. Set _inFunction_ to *true*.
+      1. Set _inMethod_ to _thisEnvRec_.HasSuperBinding().
+      1. If _F_.[[ConstructorKind]] is ~derived~, set _inDerivedConstructor_ to *true*.
+      1. Let _classFieldInitializerName_ be _F_.[[ClassFieldInitializerName]].
+      1. If _classFieldInitializerName_ is not ~empty~, set _inClassFieldInitializer_ to *true*.
+  1. Perform the following substeps in an implementation-defined order, possibly interleaving parsing and error detection:
+    1. Let _script_ be ParseText(<del>_x_</del> <ins>_xStr_</ins>, |Script|).
   1. ...
 </emu-alg>
 </emu-clause>
