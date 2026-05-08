@@ -144,8 +144,12 @@ contributors: Krzysztof Kotowicz, Mike Samuel, Luke Warlow
     1. Let _argCount_ be the number of elements in _parameterArgs_.
     1. Let _parameterStrings_ be a new empty List.
     1. For each element _arg_ of _parameterArgs_, do
-      1. Append ? ToString(_arg_) to _parameterStrings_.
-    1. Let _bodyString_ be ? ToString(_bodyArg_).
+      1. <del>Append ? ToString(_arg_) to _parameterStrings_.</del>
+      1. <ins>Let _parameterString_ be HostGetCodeForEval(_arg_).</ins>
+      1. <ins>If _parameterString_ is ~no-code~, set _parameterString_ to ? ToString(_arg_).</ins>
+      1. <ins>Append _parameterString_ to _parameterStrings_.</ins>
+    1. <ins>Let _bodyString_ be HostGetCodeForEval(_bodyArg_).</ins>
+    1. <ins>If _bodyString_ is ~no-code~, set</ins><del>Let</del> _bodyString_ be ? ToString(_bodyArg_).
     1. Let _currentRealm_ be the current Realm Record.
     1. <del>Perform ? HostEnsureCanCompileStrings(_currentRealm_, _parameterStrings_, _bodyString_, *false*).</del>
     1. Let _P_ be the empty String.
