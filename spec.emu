@@ -148,8 +148,8 @@ contributors: Krzysztof Kotowicz, Mike Samuel, Luke Warlow
       1. <ins>Let _parameterString_ be HostGetCodeForEval(_arg_).</ins>
       1. <ins>If _parameterString_ is ~no-code~, set _parameterString_ to ? ToString(_arg_).</ins>
       1. <ins>Append _parameterString_ to _parameterStrings_.</ins>
-    1. <ins>Let _bodyString_ be HostGetCodeForEval(_bodyArg_).</ins>
     1. <del>Let _bodyString_ be ? ToString(_bodyArg_).</del>
+    1. <ins>Let _bodyString_ be HostGetCodeForEval(_bodyArg_).</ins>
     1. <ins>If _bodyString_ is ~no-code~, set _bodyString_ to ? ToString(_bodyArg_).</ins>
     1. Let _currentRealm_ be the current Realm Record.
     1. <del>Perform ? HostEnsureCanCompileStrings(_currentRealm_, _parameterStrings_, _bodyString_, *false*).</del>
