@@ -14,7 +14,7 @@
 
 Champion(s): koto<br>
 Author(s): mikesamuel, koto <br>
-Stage: [3](https://tc39.github.io/process-document/) <br>
+Stage: [4](https://tc39.github.io/process-document/) <br>
 Spec: [ecmarkup output][draft spec], [source][]
 
 ## TL;DR
